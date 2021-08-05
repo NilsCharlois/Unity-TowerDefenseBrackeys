@@ -5,11 +5,17 @@ using UnityEngine.Assertions;
 
 public class Turret : MonoBehaviour
 {
+    [Header("Attributes")]
     private Transform CurrentTarget;
     public float range = 15f;
+    public float fireRate = 1f; // one per second
+    private float fireCountdown = 0f; // to start firing straight away
+    [Header("Unity Setup Fields")]
     public string enemyTag = "enemy";
     public Transform PartToRotate;
     public float rotationSpeed = 10f;
+    public GameObject bulletPrefab;
+    public Transform firePoint;
 
     void Start()
     {
@@ -56,6 +62,19 @@ public class Turret : MonoBehaviour
         Vector3 rotation = Quaternion.Lerp(PartToRotate.rotation, lookRotation, Time.deltaTime * rotationSpeed).eulerAngles;
 
         PartToRotate.rotation = Quaternion.Euler(0f, rotation.y, 0f);
+
+        if(fireCountdown <= 0) // time to shoot
+        {
+            Shoot();
+            fireCountdown = 1f / fireRate;
+        }
+        fireCountdown -= Time.deltaTime;
+    }
+
+    void Shoot()
+    {
+        Debug.Log("Shoot");
+        Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
     }
 
     void OnDrawGizmosSelected()
